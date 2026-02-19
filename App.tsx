@@ -91,7 +91,7 @@ const App: React.FC = () => {
         <header className="shadow-2xl mb-8 relative">
           <div className="h-2 bg-[#ed1c24] w-full"></div>
           <div className="bg-[#2b1d92] text-white p-6 border-b-4 border-white">
-            <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="w-full mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6 px-4">
               <div className="flex items-center gap-5">
                 <div className="w-16 h-16 bg-white p-1 rounded-lg shadow-inner flex items-center justify-center">
                   <img src={settings.logoUrl || DEFAULT_LOGO_SVG} className="max-h-full max-w-full" alt="Logo" />
@@ -105,7 +105,7 @@ const App: React.FC = () => {
                 <button
                   onClick={handlePrint}
                   disabled={isGenerating}
-                  className={`flex items-center gap-3 ${isGenerating ? 'bg-slate-400' : 'bg-[#ed1c24] hover:bg-red-700'} text-white px-10 py-4 rounded-md font-black transition-all shadow-lg active:scale-95 group uppercase text-sm tracking-widest`}
+                  className={`flex items-center gap-3 ${isGenerating ? 'bg-slate-400' : 'bg-[#ed1c24] hover:bg-red-700'} text-white px-8 py-3 rounded-md font-black transition-all shadow-lg active:scale-95 group uppercase text-sm tracking-widest`}
                 >
                   <Printer className={`w-5 h-5 ${isGenerating ? 'animate-bounce' : 'group-hover:animate-pulse'}`} />
                   {isGenerating ? 'Preparando...' : 'Imprimir Etiquetas'}
@@ -115,8 +115,8 @@ const App: React.FC = () => {
           </div>
         </header>
 
-        <main className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-8">
-          <aside className="lg:col-span-4 space-y-6">
+        <main className="w-full px-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <aside className="lg:col-span-4 lg:sticky lg:top-8 space-y-6">
             <section className="bg-white rounded-none border-l-8 border-[#2b1d92] shadow-md overflow-hidden">
               <div className="p-4 bg-slate-50 border-b flex items-center justify-between">
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Visualização Real</span>
