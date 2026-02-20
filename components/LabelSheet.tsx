@@ -11,13 +11,11 @@ export const LabelSheet: React.FC<LabelSheetProps> = ({ labels, settings }) => {
   const isLarge = settings.size === LabelSize.LARGE;
   const isSmallFile = settings.size === LabelSize.SMALL_FILE;
 
-  // Determinação precisa de etiquetas por página baseada nas dimensões do papel A4 (210x297mm)
-  // Large (153x48): cabe 1 col x 6 linhas (48*6=288mm)
-  // Small (118x30): cabe 1 col x 9 linhas (30*9=270mm)
-  // Suspensa (50x30): cabe 4 col x 9 linhas (50*4=200mm, 30*9=270mm)
+  const isPimaco365 = settings.size === LabelSize.PIMACO_365;
 
   let labelsPerPage = isLarge ? 6 : 9;
-  if (isSmallFile) labelsPerPage = 32; // 4 colunas x 8 linhas (seguro)
+  if (isSmallFile) labelsPerPage = 32;
+  if (isPimaco365) labelsPerPage = 8;
 
   const pages: LabelData[][] = [];
   for (let i = 0; i < labels.length; i += labelsPerPage) {
@@ -28,7 +26,6 @@ export const LabelSheet: React.FC<LabelSheetProps> = ({ labels, settings }) => {
     return null;
   }
 
-  // Define a estrutura de grid para cada tipo
   const getGridStyle = (): React.CSSProperties => {
     if (isSmallFile) {
       return {
@@ -37,6 +34,17 @@ export const LabelSheet: React.FC<LabelSheetProps> = ({ labels, settings }) => {
         gridAutoRows: '30mm',
         gap: '2mm',
         justifyContent: 'center',
+      };
+    }
+    if (isPimaco365) {
+      return {
+        display: 'grid',
+        gridTemplateColumns: '99mm 99mm',
+        gridTemplateRows: '67.7mm 67.7mm 67.7mm 67.7mm',
+        justifyContent: 'center',
+        alignContent: 'center',
+        width: '210mm',
+        height: '297mm'
       };
     }
     return {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { LabelData, AppSettings, LabelSize, LabelTemplate, LabelFontSize } from '../types';
+import { LabelData, AppSettings, LabelSize, LabelTemplate, LabelFontSize, MarkerShape } from '../types';
 
 interface LabelItemProps {
   label: LabelData;
@@ -9,13 +9,14 @@ interface LabelItemProps {
 export const LabelItem: React.FC<LabelItemProps> = ({ label, settings }) => {
   const isLarge = settings.size === LabelSize.LARGE;
   const isSmallFile = settings.size === LabelSize.SMALL_FILE;
+  const isPimaco365 = settings.size === LabelSize.PIMACO_365;
 
-  const width = isLarge ? '153mm' : (isSmallFile ? '50mm' : '118mm');
-  const height = isLarge ? '48mm' : '30mm';
+  const width = isPimaco365 ? '99mm' : (isLarge ? '153mm' : (isSmallFile ? '50mm' : '118mm'));
+  const height = isPimaco365 ? '67.7mm' : (isLarge ? '48mm' : '30mm');
 
   // Lógica de auto-ajuste de texto
   const getAutoFontSizes = (text: string, baseSize: number, customThreshold?: number) => {
-    const threshold = customThreshold || (isSmallFile ? 10 : (isLarge ? 25 : 20));
+    const threshold = customThreshold || (isSmallFile ? 10 : (isPimaco365 ? 20 : (isLarge ? 25 : 20)));
     if (text.length > threshold) {
       const scale = Math.max(0.4, threshold / text.length);
       return Math.round(baseSize * scale);
@@ -25,30 +26,33 @@ export const LabelItem: React.FC<LabelItemProps> = ({ label, settings }) => {
 
   const getFontSizes = () => {
     let base = {
-      title: isLarge ? 28 : (isSmallFile ? 14 : 20),
-      subtitle: isLarge ? 15 : (isSmallFile ? 9 : 11),
-      info: isLarge ? 9 : (isSmallFile ? 7 : 7.5),
-      grid: isLarge ? 11 : 8
+      title: isPimaco365 ? 32 : (isLarge ? 28 : (isSmallFile ? 14 : 20)),
+      subtitle: isPimaco365 ? 18 : (isLarge ? 15 : (isSmallFile ? 9 : 11)),
+      info: isPimaco365 ? 14 : (isLarge ? 9 : (isSmallFile ? 7 : 7.5)),
+      grid: isLarge ? 11 : 8,
+      volume: 24
     };
 
     const multiplier =
-      settings.fontSize === LabelFontSize.NORMAL ? 1.25 :
-        settings.fontSize === LabelFontSize.PROMINENT ? 1.55 :
-          1.0;
+      settings.fontSize === LabelFontSize.NORMAL ? 1.0 :
+        settings.fontSize === LabelFontSize.PROMINENT ? 1.2 :
+          0.8;
 
     let tSize = base.title * multiplier;
     let sSize = base.subtitle * multiplier;
     let iSize = base.info * multiplier;
     let gSize = base.grid * multiplier;
+    let vSize = base.volume * multiplier;
 
-    tSize = getAutoFontSizes(label.title, tSize);
-    sSize = getAutoFontSizes(label.subtitle, sSize);
+    tSize = getAutoFontSizes(label.title, tSize, isPimaco365 ? 15 : undefined);
+    sSize = getAutoFontSizes(label.subtitle, sSize, isPimaco365 ? 20 : undefined);
 
     return {
       title: `${tSize}pt`,
       subtitle: `${sSize}pt`,
       info: `${iSize}pt`,
-      grid: `${gSize}pt`
+      grid: `${gSize}pt`,
+      volume: `${vSize}pt`
     };
   };
 
@@ -63,8 +67,8 @@ export const LabelItem: React.FC<LabelItemProps> = ({ label, settings }) => {
     color: '#000',
     fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
     display: 'flex',
-    alignItems: isSmallFile ? 'flex-start' : 'center',
-    padding: isSmallFile ? '2mm 3mm' : (isLarge ? '6mm 10mm' : '3.5mm 7mm'),
+    flexDirection: 'column',
+    padding: isPimaco365 ? '5mm 7mm' : (isSmallFile ? '2mm 3mm' : (isLarge ? '6mm 10mm' : '3.5mm 7mm')),
     boxSizing: 'border-box',
     printColorAdjust: 'exact',
     WebkitPrintColorAdjust: 'exact'
@@ -72,24 +76,31 @@ export const LabelItem: React.FC<LabelItemProps> = ({ label, settings }) => {
 
   const renderMarker = () => {
     if (!label.showMarker) return null;
-    return (
-      <div
-        style={{
-          position: 'absolute',
-          top: isSmallFile ? '2mm' : (isLarge ? '6mm' : '3.5mm'),
-          right: isSmallFile ? '2mm' : (isLarge ? '6mm' : '3.5mm'),
-          width: isSmallFile ? '5mm' : (isLarge ? '10mm' : '7.5mm'),
-          height: isSmallFile ? '5mm' : (isLarge ? '10mm' : '7.5mm'),
-          borderRadius: '0.5mm',
-          backgroundColor: label.markerColor,
-          zIndex: 10,
-          border: '0.2mm solid white',
-          boxShadow: '0 0.3mm 0.5mm rgba(0,0,0,0.1)',
-          WebkitPrintColorAdjust: 'exact',
-          printColorAdjust: 'exact'
-        }}
-      />
-    );
+
+    const shape = label.markerShape || MarkerShape.SQUARE;
+    const color = label.markerColor;
+
+    const style: React.CSSProperties = {
+      position: 'absolute',
+      top: isPimaco365 ? '3mm' : (isSmallFile ? '2mm' : (isLarge ? '6mm' : '3.5mm')),
+      left: isPimaco365 ? '2.5mm' : 'auto',
+      right: isPimaco365 ? 'auto' : (isSmallFile ? '2mm' : (isLarge ? '6mm' : '3.5mm')),
+      width: isPimaco365 ? '10mm' : (isSmallFile ? '5mm' : (isLarge ? '10mm' : '7.5mm')),
+      height: isPimaco365 ? '10mm' : (isSmallFile ? '5mm' : (isLarge ? '10mm' : '7.5mm')),
+      backgroundColor: shape === MarkerShape.TRIANGLE ? 'transparent' : color,
+      borderRadius: shape === MarkerShape.CIRCLE ? '50%' : '0px',
+      zIndex: 10,
+      WebkitPrintColorAdjust: 'exact',
+      printColorAdjust: 'exact'
+    };
+
+    if (shape === MarkerShape.TRIANGLE) {
+      return (
+        <div style={{ ...style, width: 0, height: 0, borderLeft: '5mm solid transparent', borderRight: '5mm solid transparent', borderBottom: `8.6mm solid ${color}` }} />
+      );
+    }
+
+    return <div style={style} />;
   };
 
   const renderGrid = () => {
@@ -114,6 +125,45 @@ export const LabelItem: React.FC<LabelItemProps> = ({ label, settings }) => {
   };
 
   const renderTemplate = () => {
+    // Layout PIMACO INDUSTRIAL (Prioritário para PIMACO_365)
+    if (settings.template === LabelTemplate.INDUSTRIAL || isPimaco365) {
+      return (
+        <div className="flex flex-col h-full w-full justify-between items-stretch bg-white">
+          <div className="grid grid-cols-[15mm_1fr_15mm] items-start w-full">
+            <div /> {/* Espaço reservado para o marcador */}
+            <h1 className="font-black uppercase tracking-tight text-center text-slate-900" style={{ fontSize: fonts.title, lineHeight: 1.05, marginTop: '-1.5mm' }}>
+              {label.title}
+            </h1>
+            <div /> {/* Equilíbrio visual */}
+          </div>
+
+          <div className="flex flex-col gap-0.5 mt-[-2mm] border-l-4 pl-4" style={{ borderColor: label.markerColor }}>
+            <p className="font-black uppercase text-slate-800" style={{ fontSize: fonts.subtitle, lineHeight: 1 }}>{label.subtitle}</p>
+            <p className="font-bold uppercase text-slate-400 tracking-widest" style={{ fontSize: fonts.info }}>{label.info}</p>
+          </div>
+
+          <div className="flex items-end justify-between border-t-2 pt-3" style={{ borderColor: '#f1f5f9' }}>
+            <div className="flex flex-col">
+              <span className="text-[7pt] font-black uppercase tracking-[0.2em] text-slate-300 leading-none mb-1">Unidade / Vol</span>
+              <div className="font-black uppercase italic leading-none text-slate-900" style={{ fontSize: fonts.volume }}>
+                {label.volume || 1}
+              </div>
+            </div>
+
+            {settings.logoUrl ? (
+              <div className="h-[15mm] flex items-end">
+                <img src={settings.logoUrl} className="max-h-full max-w-[42mm] object-contain grayscale opacity-90 hover:grayscale-0 transition-all" alt="Logo" />
+              </div>
+            ) : (
+              <div className="border border-slate-100 px-4 py-2 text-[6pt] uppercase font-black text-slate-200 tracking-[0.3em]">
+                Authentic
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
     if (isSmallFile) {
       return (
         <div className="flex flex-col w-full text-left" style={{ width: '100%' }}>
@@ -146,7 +196,7 @@ export const LabelItem: React.FC<LabelItemProps> = ({ label, settings }) => {
               </div>
               {renderGrid()}
             </div>
-            {settings.logoUrl && !isSmallFile && (
+            {settings.logoUrl && (
               <div className="flex items-center justify-center bg-slate-50 p-2 border border-slate-100 shadow-sm" style={{ minWidth: isLarge ? '25mm' : '18mm', height: '100%' }}>
                 <img src={settings.logoUrl} alt="Logo" style={{ maxHeight: isLarge ? '25mm' : '15mm', maxWidth: '100%', objectFit: 'contain' }} />
               </div>

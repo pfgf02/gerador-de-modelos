@@ -13,13 +13,27 @@
             width: 210mm;
             height: 297mm;
             margin: 0;
-            padding: 10mm;
+            padding: 0;
+            /* Ajustado para controle total via grid */
             box-sizing: border-box;
             background: white;
             position: relative;
             overflow: hidden;
             display: block;
             page-break-after: always;
+        }
+
+        /* Grid específico para Pimaco 365 (8 etiquetas: 2x4) */
+        .pimaco-365-grid {
+            display: grid;
+            grid-template-columns: 99mm 99mm;
+            grid-template-rows: 67.7mm 67.7mm 67.7mm 67.7mm;
+            column-gap: 0;
+            row-gap: 0;
+            justify-content: center;
+            align-content: center;
+            height: 297mm;
+            width: 210mm;
         }
 
         .label-print-wrapper {
