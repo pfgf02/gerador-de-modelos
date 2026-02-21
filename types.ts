@@ -24,7 +24,8 @@ export enum LabelTemplate {
 export enum MarkerShape {
   CIRCLE = 'CIRCLE',
   SQUARE = 'SQUARE',
-  TRIANGLE = 'TRIANGLE'
+  TRIANGLE = 'TRIANGLE',
+  NONE = 'NONE'
 }
 
 export interface LabelData {

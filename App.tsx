@@ -5,17 +5,32 @@ import { LabelData, LabelSize, LabelTemplate, AppSettings, LabelFontSize, Marker
 import { LabelSheet } from './components/LabelSheet';
 import { LabelItem } from './components/LabelItem';
 
-const DEFAULT_LOGO_SVG = `data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAwIiBoZWlnaHQ9IjUwMCIgdmlld0JveD0iMCAwIDUwMCA1MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MDAiIGhlaWdodD0iNTAwIiBmaWxsPSIjMkIxRDkyIi8+CjxwYXRoIGQ9Ik03MCAzMEM5MCAzMCAxMDAgNTAgMTAwIDcwQzEwMCA5MCA4MCAxMDAgNjAgMTAwQzQwIDEwMCAzMCA4MCAzMCA2MEMzMCA0MCA1MCAzMCA3MCAzMFoiIGZpbGw9IndoaXRlIiBmaWxsLW9wYWNpdHk9IjAuMiIvPgo8cGF0aCBkPSJNMjUwIDExMEw0MDAgMzkwSDExMEwyNTAgMTEwWiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTAgNDBDNDAgMjAgNjAgNjAgMTAwIDQwQzE0MCAyMCAxNjAgNjAgMjAwIDQwQzI0MCAyMCAyNjAgNjAgMzAwIDQwQzM0MCAyMCAzNjAgNjAgNDAwIDQwQzQ0MCAyMCA0NjAgNjAgNTAwIDQwVjBIMFY0MFoiIGZpbGw9IndoaXRlIiBmaWxsLW9wYWNpdHk9IjAuOCIvPgo8L3N2Zz4=`;
+const DEFAULT_LOGO_SVG = `data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAwIiBoZWlnaHQ9IjUwMCIgdmlld0JveD0iMCAwIDUwMCA1MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MDAiIGhlaWdodD0iNTAwIiBmaWxsPSIjMDA2MEI2Ii8+CjxwYXRoIGQ9Ik03MCAzMEM5MCAzMCAxMDAgNTAgMTAwIDcwQzEwMCA5MCA4MCAxMDAgNjAgMTAwQzQwIDEwMCAzMCA4MCAzMCA2MEMzMCA0MCA1MCAzMCA3MCAzMFoiIGZpbGw9IndoaXRlIiBmaWxsLW9wYWNpdHk9IjAuMiIvPgo8cGF0aCBkPSJNMjUwIDExMEw0MDAgMzkwSDExMEwyNTAgMTEwWiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTAgNDBDNDAgMjAgNjAgNjAgMTAwIDQwQzE0MCAyMCAxNjAgNjAgMjAwIDQwQzI0MCAyMCAyNjAgNjAgMzAwIDQwQzM0MCAyMCAzNjAgNjAgNDAwIDQwQzQ0MCAyMCA0NjAgNjAgNTAwIDQwVjBIMFY0MFoiIGZpbGw9IndoaXRlIiBmaWxsLW9wYWNpdHk9IjAuOCIvPgo8L3N2Zz4=`;
 
 const App: React.FC = () => {
   const [labels, setLabels] = useState<LabelData[]>([]);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'manual' | 'industrial'>('industrial');
+
+  // Sync active tab to URL for deep linking
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get('tab');
+    if (tab === 'manual' || tab === 'industrial') {
+      setActiveTab(tab);
+    }
+  }, []);
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    url.searchParams.set('tab', activeTab);
+    window.history.replaceState({}, '', url);
+  }, [activeTab]);
   const [settings, setSettings] = useState<AppSettings>({
     size: LabelSize.PIMACO_365,
     fontSize: LabelFontSize.NORMAL,
     template: LabelTemplate.INDUSTRIAL,
-    primaryColor: '#2b1d92',
+    primaryColor: '#0060B6',
     logoUrl: null,
     globalTitle: ''
   });
@@ -29,7 +44,7 @@ const App: React.FC = () => {
     quantidade: 1,
     inicioSequencia: 1,
     markerShape: MarkerShape.TRIANGLE,
-    markerColor: '#e91e63'
+    markerColor: '#ED1C24'
   });
 
   const generateBatch = () => {
@@ -118,28 +133,52 @@ const App: React.FC = () => {
   const isPimaco365 = settings.size === LabelSize.PIMACO_365;
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] flex flex-col font-sans selection:bg-indigo-100 selection:text-indigo-900">
+    <div className="min-h-screen bg-[#f1f7ff] flex flex-col font-sans selection:bg-brand-blue selection:text-white text-slate-800">
       <div className="no-print flex-grow pb-24">
         {/* Top Branding Bar */}
-        <div className="bg-[#0f172a] h-1.5 w-full"></div>
+        <div className="bg-brand-blue h-1.5 w-full shadow-[0_2px_10px_rgba(0,96,182,0.3)]"></div>
 
-        <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
-          <div className="max-w-[1600px] mx-auto px-8 py-5">
+        <header className="bg-white border-b border-slate-200 sticky top-0 z-50 overflow-hidden">
+          {/* Bahia Panoramic Banner Concept */}
+          <div className="absolute inset-0 z-0 opacity-[0.07] pointer-events-none overflow-hidden select-none">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-orange-100/50 to-transparent"></div>
+            <div className="w-full h-full flex items-center justify-around px-20">
+              <div className="flex flex-col items-center gap-2 transform -rotate-12 opacity-50">
+                <div className="w-16 h-1 bg-amber-200 rounded-full"></div>
+                <div className="w-12 h-1 bg-amber-100 rounded-full"></div>
+              </div>
+              <div className="flex flex-col items-center gap-3 scale-150 opacity-40">
+                <div className="w-8 h-8 rounded-full border-2 border-slate-200"></div>
+                <div className="w-1 h-20 bg-slate-100 rounded-full"></div>
+              </div>
+              <div className="flex gap-4 items-end opacity-30">
+                {[1, 2, 3, 4].map(i => (
+                  <div key={i} className="w-1.5 bg-blue-200 rounded-t-full" style={{ height: `${i * 15}px` }}></div>
+                ))}
+              </div>
+              <div className="flex flex-col items-center gap-2 transform rotate-6 opacity-40">
+                <div className="w-10 h-10 border-4 border-amber-200/50 rounded-sm"></div>
+                <div className="w-20 h-2 bg-amber-100/50 rounded-full"></div>
+              </div>
+            </div>
+          </div>
+
+          <div className="w-full px-6 py-4 relative z-10">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="flex items-center gap-5">
                 <div className="relative group">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-blue-600 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                  <div className="absolute -inset-1 bg-gradient-to-r from-brand-blue to-blue-700 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
                   <div className="relative w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center border border-slate-100">
-                    <div className="w-7 h-7 bg-[#2b1d92] flex items-center justify-center rounded-lg shadow-lg">
+                    <div className="w-7 h-7 bg-brand-blue flex items-center justify-center rounded-lg shadow-lg">
                       <div className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[10px] border-b-white"></div>
                     </div>
                   </div>
                 </div>
                 <div>
-                  <h1 className="text-2xl font-black tracking-tight text-slate-900 uppercase italic leading-none flex items-center gap-2">
-                    ETIQUETAS <span className="text-indigo-600 italic not-uppercase font-serif lowercase opacity-50">pro</span>
+                  <h1 className="text-2xl font-semibold tracking-tight text-slate-900 uppercase italic leading-none flex items-center gap-2">
+                    ETIQUETAS <span className="text-brand-blue italic not-uppercase font-serif lowercase opacity-50">pro</span>
                   </h1>
-                  <p className="text-slate-400 text-[9px] font-bold mt-1 tracking-[0.25em] uppercase">Sistema de Padronização Industrial</p>
+                  <p className="text-brand-blue/60 text-[10px] font-medium mt-1.5 tracking-[0.25em] uppercase">Estação de Padronização Industrial</p>
                 </div>
               </div>
 
@@ -148,42 +187,42 @@ const App: React.FC = () => {
                 <button
                   onClick={handlePrint}
                   disabled={isGenerating || labels.length === 0}
-                  className={`relative flex items-center gap-3 overflow-hidden rounded-xl px-8 py-3.5 text-xs font-black tracking-widest uppercase transition-all shadow-lg active:scale-95 group ${isGenerating || labels.length === 0
+                  className={`relative flex items-center gap-3 overflow-hidden rounded-xl px-10 py-4 text-[10px] font-semibold tracking-widest uppercase transition-all shadow-lg active:scale-95 group ${isGenerating || labels.length === 0
                     ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200 shadow-none'
-                    : 'bg-[#ef4444] text-white hover:bg-[#dc2626] hover:shadow-red-200/50'
+                    : 'bg-brand-red text-white hover:bg-red-700 hover:shadow-red-200/50'
                     }`}
                 >
-                  <Printer className={`w-4 h-4 ${isGenerating ? 'animate-bounce' : 'group-hover:translate-y-[-2px] transition-transform'}`} />
-                  {isGenerating ? 'Prevalidando...' : 'Gerar Documento PDF'}
+                  <Printer className={`w-4 h-4 ${isGenerating ? 'animate-bounce' : 'group-hover:translate-y-[-1px] transition-transform'}`} />
+                  {isGenerating ? 'Processando Documento...' : 'Gerar Pack PDF'}
                 </button>
               </div>
             </div>
           </div>
         </header>
 
-        <main className="max-w-[1600px] mx-auto p-8 grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+        <main className="w-full px-6 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <aside className="lg:col-span-4 lg:sticky lg:top-28 space-y-8">
             {/* Action Card */}
             <section className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 overflow-hidden translate-y-0 hover:-translate-y-1 transition-transform duration-300">
               <div className="flex p-1 bg-slate-50 border-b">
                 <button
                   onClick={() => setActiveTab('industrial')}
-                  className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab === 'industrial'
-                    ? 'bg-white text-indigo-600 shadow-sm'
-                    : 'text-slate-400 hover:text-slate-600'
+                  className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[10px] font-medium uppercase tracking-wider transition-all ${activeTab === 'industrial'
+                    ? 'bg-white text-brand-blue shadow-sm ring-1 ring-brand-blue/10'
+                    : 'text-slate-400 hover:text-brand-blue hover:bg-brand-blue/5'
                     }`}
                 >
-                  <Package className={`w-4 h-4 ${activeTab === 'industrial' ? 'text-indigo-600' : 'text-slate-300'}`} />
+                  <Package className={`w-4 h-4 ${activeTab === 'industrial' ? 'text-brand-blue' : 'text-slate-300'}`} />
                   Lote Industrial
                 </button>
                 <button
                   onClick={() => setActiveTab('manual')}
-                  className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab === 'manual'
-                    ? 'bg-white text-indigo-600 shadow-sm'
-                    : 'text-slate-400 hover:text-slate-600'
+                  className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[10px] font-medium uppercase tracking-wider transition-all ${activeTab === 'manual'
+                    ? 'bg-white text-brand-blue shadow-sm ring-1 ring-brand-blue/10'
+                    : 'text-slate-400 hover:text-brand-blue hover:bg-brand-blue/5'
                     }`}
                 >
-                  <Plus className={`w-4 h-4 ${activeTab === 'manual' ? 'text-indigo-600' : 'text-slate-300'}`} />
+                  <Plus className={`w-4 h-4 ${activeTab === 'manual' ? 'text-brand-blue' : 'text-slate-300'}`} />
                   Adição Manual
                 </button>
               </div>
@@ -193,64 +232,73 @@ const App: React.FC = () => {
                   <div className="space-y-6">
                     <div className="grid grid-cols-2 gap-5">
                       <div className="col-span-2">
-                        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2 tracking-wide">Identificação do Cliente</label>
+                        <label htmlFor="cliente-input" className="block text-[10px] font-medium text-brand-blue uppercase mb-2 tracking-wide">Identificação do Cliente</label>
                         <div className="relative group">
-                          <User className="absolute left-3.5 top-3.5 w-4 h-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+                          <User aria-hidden="true" className="absolute left-3.5 top-3.5 w-4 h-4 text-slate-400 group-focus-within:text-brand-blue transition-colors" />
                           <input
+                            id="cliente-input"
                             type="text"
                             maxLength={20}
+                            autocomplete="organization"
+                            spellcheck="false"
                             value={batchForm.cliente}
                             onChange={e => setBatchForm({ ...batchForm, cliente: e.target.value })}
-                            className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 pl-11 text-xs font-semibold uppercase outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all"
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 pl-11 text-xs font-semibold uppercase outline-none focus-visible:ring-4 focus-visible:ring-brand-blue/10 focus-visible:border-brand-blue transition-colors"
                             placeholder="CLIENTE FINAL OU PROJETO"
                           />
                         </div>
                       </div>
 
                       <div className="col-span-1">
-                        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2 tracking-wide">Ambiente</label>
+                        <label htmlFor="ambiente-input" className="block text-[10px] font-medium text-brand-blue uppercase mb-2 tracking-wide">Ambiente</label>
                         <div className="relative group">
-                          <MapPin className="absolute left-3.5 top-3.5 w-4 h-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+                          <MapPin aria-hidden="true" className="absolute left-3.5 top-3.5 w-4 h-4 text-slate-400 group-focus-within:text-brand-blue transition-colors" />
                           <input
+                            id="ambiente-input"
                             type="text"
                             maxLength={20}
+                            autocomplete="street-address"
                             value={batchForm.ambiente}
                             onChange={e => setBatchForm({ ...batchForm, ambiente: e.target.value })}
-                            className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 pl-11 text-xs font-semibold uppercase outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all"
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 pl-11 text-xs font-semibold uppercase outline-none focus-visible:ring-4 focus-visible:ring-brand-blue/10 focus-visible:border-brand-blue transition-colors"
                             placeholder="EX: COZINHA"
                           />
                         </div>
                       </div>
 
                       <div className="col-span-1">
-                        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2 tracking-wide">Nº Pedido</label>
+                        <label htmlFor="pedido-input" className="block text-[10px] font-medium text-brand-blue uppercase mb-2 tracking-wide">Nº Pedido</label>
                         <div className="relative group">
-                          <Hash className="absolute left-3.5 top-3.5 w-4 h-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+                          <Hash aria-hidden="true" className="absolute left-3.5 top-3.5 w-4 h-4 text-slate-400 group-focus-within:text-brand-blue transition-colors" />
                           <input
+                            id="pedido-input"
                             type="text"
+                            autocomplete="off"
                             value={batchForm.pedido}
                             onChange={e => setBatchForm({ ...batchForm, pedido: e.target.value })}
-                            className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 pl-11 text-xs font-semibold uppercase outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all"
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 pl-11 text-xs font-semibold uppercase outline-none focus-visible:ring-4 focus-visible:ring-brand-blue/10 focus-visible:border-brand-blue transition-colors"
                             placeholder="0000"
                           />
                         </div>
                       </div>
 
                       <div className="col-span-1">
-                        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2 tracking-wide">Marcador</label>
+                        <label htmlFor="marcador-select" className="block text-[10px] font-medium text-brand-blue uppercase mb-2 tracking-wide">Marcador</label>
                         <select
+                          id="marcador-select"
                           value={batchForm.markerShape}
                           onChange={e => setBatchForm({ ...batchForm, markerShape: e.target.value as MarkerShape })}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-xs font-semibold uppercase outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all appearance-none cursor-pointer"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-xs font-semibold uppercase outline-none focus-visible:ring-4 focus-visible:ring-brand-blue/10 focus-visible:border-brand-blue transition-colors appearance-none cursor-pointer"
                         >
                           <option value={MarkerShape.TRIANGLE}>▲ Triângulo</option>
                           <option value={MarkerShape.CIRCLE}>● Círculo</option>
                           <option value={MarkerShape.SQUARE}>■ Quadrado</option>
+                          <option value={MarkerShape.NONE}>Nenhum</option>
                         </select>
                       </div>
 
                       <div className="col-span-1">
-                        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2 tracking-wide">Cor Ident.</label>
+                        <label className="block text-[10px] font-medium text-brand-blue uppercase mb-2 tracking-wide">Cor Ident.</label>
                         <div className="flex gap-2">
                           <input
                             type="color"
@@ -265,31 +313,31 @@ const App: React.FC = () => {
                       </div>
 
                       <div className="col-span-1">
-                        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2 tracking-wide">Quantidade</label>
+                        <label className="block text-[10px] font-medium text-brand-blue uppercase mb-2 tracking-wide">Quantidade</label>
                         <input
                           type="number"
                           min={1}
                           value={batchForm.quantidade}
                           onChange={e => setBatchForm({ ...batchForm, quantidade: parseInt(e.target.value) || 1 })}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-xs font-semibold uppercase outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-xs font-semibold uppercase outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/5 transition-all"
                         />
                       </div>
 
                       <div className="col-span-1">
-                        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2 tracking-wide">Início Seq.</label>
+                        <label className="block text-[10px] font-medium text-brand-blue uppercase mb-2 tracking-wide">Início Seq.</label>
                         <input
                           type="number"
                           min={1}
                           value={batchForm.inicioSequencia}
                           onChange={e => setBatchForm({ ...batchForm, inicioSequencia: parseInt(e.target.value) || 1 })}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-xs font-semibold uppercase outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-xs font-semibold uppercase outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/5 transition-all"
                         />
                       </div>
                     </div>
 
                     <button
                       onClick={generateBatch}
-                      className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl p-4 font-black uppercase text-xs tracking-[0.15em] transition-all active:scale-[0.98] flex items-center justify-center gap-3 shadow-xl shadow-indigo-200 mt-2 group"
+                      className="w-full bg-brand-blue hover:bg-blue-700 text-white rounded-xl p-4 font-semibold uppercase text-xs tracking-[0.15em] transition-all active:scale-[0.98] flex items-center justify-center gap-3 shadow-xl shadow-blue-200 mt-2 group"
                     >
                       <Sparkles className="w-4 h-4 group-hover:rotate-12 transition-transform" />
                       Gerar Pack de Lote
@@ -297,14 +345,14 @@ const App: React.FC = () => {
                   </div>
                 ) : (
                   <div className="space-y-6 py-4">
-                    <div className="p-4 bg-indigo-50 rounded-2xl border border-indigo-100 italic">
-                      <p className="text-[10px] font-semibold text-indigo-700 uppercase tracking-wide leading-relaxed">
+                    <div className="p-4 bg-brand-blue/5 rounded-2xl border border-brand-blue/10 italic">
+                      <p className="text-[10px] font-semibold text-brand-blue uppercase tracking-wide leading-relaxed">
                         Modo especializado para etiquetas individuais, lombadas de pasta e sinalização avulsa.
                       </p>
                     </div>
                     <button
                       onClick={addLabel}
-                      className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl p-4 font-black uppercase text-xs tracking-[0.15em] transition-all active:scale-[0.98] flex items-center justify-center gap-3 shadow-xl shadow-indigo-200 group"
+                      className="w-full bg-brand-blue hover:bg-blue-700 text-white rounded-xl p-4 font-semibold uppercase text-xs tracking-[0.15em] transition-all active:scale-[0.98] flex items-center justify-center gap-3 shadow-xl shadow-blue-200 group"
                     >
                       <Plus className="w-5 h-5 group-hover:scale-110 transition-transform" />
                       Nova Etiqueta Manual
@@ -320,12 +368,12 @@ const App: React.FC = () => {
                 <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center">
                   <Settings2 className="w-4 h-4 text-slate-400" />
                 </div>
-                <h2 className="font-extrabold uppercase text-[11px] tracking-[0.2em] text-slate-800">Propriedades Globais</h2>
+                <h2 className="font-semibold uppercase text-[11px] tracking-[0.2em] text-brand-blue">Propriedades Globais</h2>
               </div>
 
               <div className="grid grid-cols-1 gap-6">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-3 tracking-wide flex items-center gap-2">
+                  <label className="block text-[10px] font-medium text-brand-blue/50 uppercase mb-3 tracking-wide flex items-center gap-2">
                     <ImageIcon className="w-3 h-3" /> Logotipo Institucional
                   </label>
                   <div className="flex flex-col gap-2">
@@ -357,12 +405,12 @@ const App: React.FC = () => {
                     ) : (
                       <button
                         onClick={() => fileInputRef.current?.click()}
-                        className="w-full h-24 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/50 hover:bg-white hover:border-indigo-400 transition-all flex flex-col items-center justify-center gap-3 group"
+                        className="w-full h-24 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/50 hover:bg-white hover:border-brand-blue/40 transition-all flex flex-col items-center justify-center gap-3 group"
                       >
                         <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:scale-110 transition-transform">
-                          <ImageIcon className="w-5 h-5 text-slate-300 group-hover:text-indigo-500 transition-colors" />
+                          <ImageIcon className="w-5 h-5 text-slate-300 group-hover:text-brand-blue transition-colors" />
                         </div>
-                        <span className="text-[9px] font-black uppercase text-slate-400 tracking-widest group-hover:text-indigo-600 transition-colors">Vincular Logotipo</span>
+                        <span className="text-[9px] font-semibold uppercase text-slate-400 tracking-widest group-hover:text-brand-blue transition-colors">Vincular Logotipo</span>
                       </button>
                     )}
                     <input type="file" ref={fileInputRef} onChange={handleLogoUpload} className="hidden" accept="image/*" />
@@ -370,13 +418,13 @@ const App: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-3 tracking-wide flex items-center gap-2">
+                  <label className="block text-[10px] font-medium text-slate-400 uppercase mb-3 tracking-wide flex items-center gap-2">
                     <Layout className="w-3 h-3" /> Formato do Papel
                   </label>
                   <select
                     value={settings.size}
                     onChange={(e) => setSettings({ ...settings, size: e.target.value as LabelSize })}
-                    className="w-full bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-xl p-3.5 font-bold uppercase outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all appearance-none cursor-pointer"
+                    className="w-full bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-xl p-3.5 font-medium uppercase outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/5 transition-all appearance-none cursor-pointer"
                   >
                     <option value={LabelSize.PIMACO_365}>Standard: Pimaco A4365 (99x67.7)</option>
                     <option value={LabelSize.LARGE}>Pasta: Lombo Largo (153x48)</option>
@@ -386,13 +434,13 @@ const App: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-3 tracking-wide flex items-center gap-2">
+                  <label className="block text-[10px] font-medium text-slate-400 uppercase mb-3 tracking-wide flex items-center gap-2">
                     <Palette className="w-3 h-3" /> Estilo de Design
                   </label>
                   <select
                     value={settings.template}
                     onChange={(e) => setSettings({ ...settings, template: e.target.value as LabelTemplate })}
-                    className="w-full bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-xl p-3.5 font-bold uppercase outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all appearance-none cursor-pointer"
+                    className="w-full bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-xl p-3.5 font-medium uppercase outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/5 transition-all appearance-none cursor-pointer"
                   >
                     <option value={LabelTemplate.INDUSTRIAL}>Layout Industrial v2</option>
                     <option value={LabelTemplate.CORPORATE}>Corporativo Clean</option>
@@ -404,7 +452,7 @@ const App: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-3 tracking-wide flex items-center gap-2">
+                  <label className="block text-[10px] font-medium text-slate-400 uppercase mb-3 tracking-wide flex items-center gap-2">
                     <Type className="w-3 h-3" /> Densidade Tipográfica
                   </label>
                   <div className="grid grid-cols-3 gap-2">
@@ -416,8 +464,8 @@ const App: React.FC = () => {
                       <button
                         key={opt.val}
                         onClick={() => setSettings({ ...settings, fontSize: opt.val as LabelFontSize })}
-                        className={`py-3 rounded-xl text-[9px] font-black uppercase tracking-tighter transition-all border-2 ${settings.fontSize === opt.val
-                          ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
+                        className={`py-3 rounded-xl text-[9px] font-semibold uppercase tracking-tighter transition-all border-2 ${settings.fontSize === opt.val
+                          ? 'border-brand-blue bg-brand-blue/5 text-brand-blue'
                           : 'border-slate-100 bg-slate-50 text-slate-400 hover:border-slate-200 hover:text-slate-600'
                           }`}
                       >
@@ -435,19 +483,24 @@ const App: React.FC = () => {
               <div className="bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-slate-100 overflow-hidden">
                 <div className="p-8 border-b border-slate-50 flex items-center justify-between bg-white sticky top-0 md:top-[88px] z-40 backdrop-blur-sm bg-white/90">
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-2xl bg-slate-900 flex items-center justify-center text-white shadow-lg">
+                    <div className="w-10 h-10 rounded-2xl bg-brand-blue flex items-center justify-center text-white shadow-lg shadow-brand-blue/20">
                       <TableIcon className="w-5 h-5" />
                     </div>
                     <div>
-                      <h2 className="text-slate-900 font-extrabold uppercase text-sm tracking-widest">Painel de Composição</h2>
-                      <p className="text-slate-400 text-[9px] font-bold uppercase tracking-widest mt-0.5">{labels.length} Etiquetas geradas</p>
+                      <h2 className="text-slate-900 font-semibold uppercase text-sm tracking-widest">Painel de Composição</h2>
+                      <p className="text-slate-400 text-[9px] font-medium uppercase tracking-widest mt-0.5">{labels.length} Etiquetas geradas</p>
                     </div>
                   </div>
                   <button
-                    onClick={() => setLabels([])}
-                    className="flex items-center gap-2 text-[10px] bg-slate-50 hover:bg-red-50 text-slate-500 hover:text-red-500 px-6 py-3 rounded-xl font-black uppercase tracking-widest transition-all active:scale-95 group"
+                    onClick={() => {
+                      if (labels.length > 0 && confirm('Tem certeza que deseja remover todas as etiquetas do pack atual? Esta ação não pode ser desfeita.')) {
+                        setLabels([]);
+                      }
+                    }}
+                    aria-label="Limpar pack de etiquetas"
+                    className="flex items-center gap-2 text-[10px] bg-slate-100/50 hover:bg-brand-red hover:text-white px-6 py-3 rounded-xl font-semibold uppercase tracking-widest transition-colors active:scale-95 group shadow-sm shadow-slate-100 focus-visible:ring-4 focus-visible:ring-brand-red/20 focus-visible:outline-none"
                   >
-                    <Trash2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                    <Trash2 aria-hidden="true" className="w-4 h-4 group-hover:scale-110 transition-transform" />
                     Limpar Pack
                   </button>
                 </div>
@@ -474,7 +527,7 @@ const App: React.FC = () => {
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="bg-slate-50/50 text-slate-400 text-[10px] uppercase tracking-[0.2em] font-extrabold border-b border-slate-100">
+                      <tr className="bg-slate-50/50 text-slate-400 text-[10px] uppercase tracking-[0.2em] font-semibold border-b border-slate-100">
                         <th className="px-8 py-5">Identificação</th>
                         <th className="px-8 py-5 text-center">Referência</th>
                         <th className="px-8 py-5 text-center">Codificação</th>
@@ -487,22 +540,22 @@ const App: React.FC = () => {
                           <tr
                             onClick={() => setExpandedRow(expandedRow === label.id ? null : label.id)}
                             className={`group cursor-pointer transition-all duration-300 ${expandedRow === label.id
-                              ? 'bg-indigo-600 text-white shadow-inner'
+                              ? 'bg-brand-blue text-white shadow-lg shadow-brand-blue/20'
                               : 'hover:bg-slate-50/80 bg-white text-slate-700'
                               }`}
                           >
                             <td className="px-8 py-6">
                               <div className="flex flex-col gap-1">
-                                <span className={`text-[13px] font-black uppercase tracking-tight ${expandedRow === label.id ? 'text-white' : 'text-slate-900'}`}>
+                                <span className={`text-[13px] font-semibold uppercase tracking-tight ${expandedRow === label.id ? 'text-white' : 'text-slate-900'}`}>
                                   {label.title}
                                 </span>
-                                <span className={`text-[10px] font-bold uppercase tracking-wide opacity-60`}>
+                                <span className={`text-[10px] font-medium uppercase tracking-wide opacity-60`}>
                                   {label.subtitle}
                                 </span>
                               </div>
                             </td>
                             <td className="px-8 py-6 text-center">
-                              <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${expandedRow === label.id ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                              <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-widest ${expandedRow === label.id ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
                                 }`}>
                                 {settings.template === LabelTemplate.INDUSTRIAL ? `SEQ ${label.volume}` : label.year}
                               </span>
@@ -528,49 +581,49 @@ const App: React.FC = () => {
                           {expandedRow === label.id && (
                             <tr className="bg-white">
                               <td colSpan={4} className="p-0">
-                                <div className="p-10 bg-gradient-to-b from-indigo-50/30 to-white animate-in slide-in-from-top-4 duration-500">
+                                <div className="p-10 bg-gradient-to-b from-brand-blue/5 to-white animate-in slide-in-from-top-4 duration-500">
                                   <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10">
                                     <div className="space-y-6">
-                                      <div className="flex items-center gap-3 border-b border-indigo-100 pb-3">
-                                        <Type className="w-4 h-4 text-indigo-500" />
-                                        <h4 className="text-[10px] font-black uppercase tracking-widest text-indigo-900">Configuração de Texto</h4>
+                                      <div className="flex items-center gap-3 border-b border-brand-blue/10 pb-3">
+                                        <Type className="w-4 h-4 text-brand-blue" />
+                                        <h4 className="text-[10px] font-semibold uppercase tracking-widest text-brand-blue">Configuração de Texto</h4>
                                       </div>
                                       <div className="space-y-5">
                                         <div>
-                                          <label className="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-wide">Título Principal</label>
+                                          <label className="block text-[9px] font-medium text-slate-400 uppercase mb-2 tracking-wide">Título Principal</label>
                                           <input
                                             type="text"
                                             value={label.title}
                                             onChange={e => updateLabel(label.id, 'title', e.target.value.toUpperCase())}
-                                            className="w-full bg-white border border-slate-200 rounded-xl p-3.5 text-xs font-bold uppercase outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all shadow-sm"
+                                            className="w-full bg-white border border-slate-200 rounded-xl p-3.5 text-xs font-medium uppercase outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/5 transition-all shadow-sm"
                                           />
                                         </div>
                                         <div>
-                                          <label className="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-wide">Subtítulo / Cliente</label>
+                                          <label className="block text-[9px] font-medium text-slate-400 uppercase mb-2 tracking-wide">Subtítulo / Cliente</label>
                                           <input
                                             type="text"
                                             value={label.subtitle}
                                             onChange={e => updateLabel(label.id, 'subtitle', e.target.value.toUpperCase())}
-                                            className="w-full bg-white border border-slate-200 rounded-xl p-3.5 text-xs font-bold uppercase outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all shadow-sm"
+                                            className="w-full bg-white border border-slate-200 rounded-xl p-3.5 text-xs font-medium uppercase outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/5 transition-all shadow-sm"
                                           />
                                         </div>
                                         <div className="grid grid-cols-2 gap-4">
                                           <div>
-                                            <label className="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-wide">Info Adicional</label>
+                                            <label className="block text-[9px] font-medium text-slate-400 uppercase mb-2 tracking-wide">Info Adicional</label>
                                             <input
                                               type="text"
                                               value={label.info}
                                               onChange={e => updateLabel(label.id, 'info', e.target.value)}
-                                              className="w-full bg-white border border-slate-200 rounded-xl p-3.5 text-xs font-bold uppercase outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all shadow-sm"
+                                              className="w-full bg-white border border-slate-200 rounded-xl p-3.5 text-xs font-medium uppercase outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/5 transition-all shadow-sm"
                                             />
                                           </div>
                                           <div>
-                                            <label className="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-wide">{settings.template === LabelTemplate.INDUSTRIAL ? 'Volume' : 'Ano'}</label>
+                                            <label className="block text-[9px] font-medium text-slate-400 uppercase mb-2 tracking-wide">{settings.template === LabelTemplate.INDUSTRIAL ? 'Volume' : 'Ano'}</label>
                                             <input
                                               type={settings.template === LabelTemplate.INDUSTRIAL ? 'number' : 'text'}
                                               value={settings.template === LabelTemplate.INDUSTRIAL ? label.volume : label.year}
                                               onChange={e => updateLabel(label.id, settings.template === LabelTemplate.INDUSTRIAL ? 'volume' : 'year', e.target.value)}
-                                              className="w-full bg-white border border-slate-200 rounded-xl p-3.5 text-xs font-bold uppercase outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all shadow-sm"
+                                              className="w-full bg-white border border-slate-200 rounded-xl p-3.5 text-xs font-medium uppercase outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/5 transition-all shadow-sm"
                                             />
                                           </div>
                                         </div>
@@ -578,14 +631,14 @@ const App: React.FC = () => {
                                     </div>
 
                                     <div className="space-y-6">
-                                      <div className="flex items-center gap-3 border-b border-indigo-100 pb-3">
-                                        <Palette className="w-4 h-4 text-indigo-500" />
-                                        <h4 className="text-[10px] font-black uppercase tracking-widest text-indigo-900">Estilização do Marcador</h4>
+                                      <div className="flex items-center gap-3 border-b border-brand-blue/10 pb-3">
+                                        <Palette className="w-4 h-4 text-brand-blue" />
+                                        <h4 className="text-[10px] font-semibold uppercase tracking-widest text-brand-blue">Estilização do Marcador</h4>
                                       </div>
                                       <div className="space-y-6">
                                         <div className="grid grid-cols-2 gap-5">
                                           <div>
-                                            <label className="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-wide">Cor do Identificador</label>
+                                            <label className="block text-[9px] font-medium text-slate-400 uppercase mb-2 tracking-wide">Cor do Identificador</label>
                                             <div className="flex gap-2">
                                               <div className="relative group/color">
                                                 <input
@@ -599,28 +652,29 @@ const App: React.FC = () => {
                                                 type="text"
                                                 value={label.markerColor}
                                                 onChange={e => updateLabel(label.id, 'markerColor', e.target.value)}
-                                                className="flex-1 bg-white border border-slate-200 rounded-xl p-3 text-[10px] font-mono font-bold uppercase outline-none focus:border-indigo-500 transition-all shadow-sm"
+                                                className="flex-1 bg-white border border-slate-200 rounded-xl p-3 text-[10px] font-mono font-medium uppercase outline-none focus:border-brand-blue transition-all shadow-sm"
                                               />
                                             </div>
                                           </div>
                                           <div>
-                                            <label className="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-wide">Geometria</label>
+                                            <label className="block text-[9px] font-medium text-slate-400 uppercase mb-2 tracking-wide">Geometria</label>
                                             <select
                                               value={label.markerShape}
                                               onChange={e => updateLabel(label.id, 'markerShape', e.target.value)}
-                                              className="w-full bg-white border border-slate-200 rounded-xl p-3.5 text-xs font-bold uppercase outline-none focus:border-indigo-500 transition-all appearance-none cursor-pointer shadow-sm"
+                                              className="w-full bg-white border border-slate-200 rounded-xl p-3.5 text-xs font-medium uppercase outline-none focus:border-brand-blue transition-all appearance-none cursor-pointer shadow-sm"
                                             >
                                               <option value={MarkerShape.CIRCLE}>Círculo</option>
                                               <option value={MarkerShape.SQUARE}>Quadrado</option>
                                               <option value={MarkerShape.TRIANGLE}>Triângulo</option>
+                                              <option value={MarkerShape.NONE}>Nenhum</option>
                                             </select>
                                           </div>
                                         </div>
 
-                                        <div className="pt-4 border-t border-indigo-50">
+                                        <div className="pt-4 border-t border-brand-blue/5">
                                           <button
                                             onClick={() => removeLabel(label.id)}
-                                            className="w-full flex items-center justify-center gap-3 p-4 rounded-xl text-[10px] font-black uppercase tracking-widest text-red-500 bg-red-50 border border-red-100 hover:bg-red-100 transition-all group/del"
+                                            className="w-full flex items-center justify-center gap-3 p-4 rounded-xl text-[10px] font-semibold uppercase tracking-widest text-brand-red bg-brand-red/5 border border-brand-red/10 hover:bg-brand-red/10 transition-all group/del"
                                           >
                                             <Trash2 className="w-4 h-4 group-hover/del:rotate-12 transition-transform" />
                                             Eliminar Etiqueta do Pack
@@ -632,18 +686,18 @@ const App: React.FC = () => {
                                     {settings.template === LabelTemplate.GRID && (
                                       <div className="col-span-1 md:col-span-2 mt-4 space-y-6 bg-slate-900 rounded-2xl p-8 shadow-2xl">
                                         <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-                                          <Grid3X3 className="w-5 h-5 text-indigo-400" />
-                                          <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-white">Conteúdo da Grade de Dados</h4>
+                                          <Grid3X3 className="w-5 h-5 text-brand-blue/60" />
+                                          <h4 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white">Conteúdo da Grade de Dados</h4>
                                         </div>
                                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                           {(label.gridItems || Array(8).fill('')).map((item, idx) => (
                                             <div key={idx}>
-                                              <label className="block text-[8px] font-bold text-slate-500 uppercase mb-2 tracking-widest">Canal {idx + 1}</label>
+                                              <label className="block text-[8px] font-medium text-slate-500 uppercase mb-2 tracking-widest">Canal {idx + 1}</label>
                                               <input
                                                 type="text"
                                                 value={item}
                                                 onChange={e => updateGridItem(label.id, idx, e.target.value.toUpperCase())}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-[11px] font-black text-white uppercase outline-none focus:border-indigo-500 focus:bg-white/10 transition-all"
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-[11px] font-semibold text-white uppercase outline-none focus:border-brand-blue focus:bg-white/10 transition-all"
                                                 placeholder="---"
                                               />
                                             </div>
@@ -668,20 +722,20 @@ const App: React.FC = () => {
                   <Package className="w-10 h-10 text-slate-200" />
                   <div className="absolute inset-0 border-2 border-slate-100 rounded-full animate-ping opacity-20"></div>
                 </div>
-                <h3 className="text-xl font-black uppercase tracking-[0.3em] text-slate-800 mb-3">Aguardando Lote</h3>
-                <p className="text-slate-400 text-[11px] max-w-sm leading-relaxed font-bold uppercase tracking-widest opacity-60">
+                <h3 className="text-xl font-semibold uppercase tracking-[0.3em] text-slate-800 mb-3">Aguardando Lote</h3>
+                <p className="text-slate-400 text-[11px] max-w-sm leading-relaxed font-medium uppercase tracking-widest opacity-60">
                   Inicie a composição do seu pack industrial através do painel de controle lateral ou adicione itens manuais.
                 </p>
                 <div className="mt-10 flex gap-4">
-                  <div className="w-2 h-2 rounded-full bg-indigo-500 animate-bounce"></div>
-                  <div className="w-2 h-2 rounded-full bg-indigo-400 animate-bounce [animation-delay:-0.15s]"></div>
-                  <div className="w-2 h-2 rounded-full bg-indigo-300 animate-bounce [animation-delay:-0.3s]"></div>
+                  <div className="w-2.5 h-2.5 rounded-full bg-brand-blue animate-bounce"></div>
+                  <div className="w-2.5 h-2.5 rounded-full bg-brand-blue/60 animate-bounce [animation-delay:-0.15s]"></div>
+                  <div className="w-2.5 h-2.5 rounded-full bg-brand-blue/30 animate-bounce [animation-delay:-0.3s]"></div>
                 </div>
               </div>
             )}
           </div>
         </main>
-      </div>
+      </div >
 
       <div className="print-only">
         <LabelSheet labels={labels} settings={settings} />
@@ -690,16 +744,16 @@ const App: React.FC = () => {
       {/* Footer / Status Bar */}
       <footer className="no-print bg-white border-t border-slate-200 py-4 px-10 fixed bottom-0 w-full z-50 flex items-center justify-between shadow-[0_-10px_20px_rgba(0,0,0,0.02)]">
         <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-            <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">System Ready</span>
+          <div className="flex items-center gap-2" aria-live="polite">
+            <div className="w-2 h-2 rounded-full bg-brand-blue animate-pulse shadow-[0_0_8px_rgba(0,96,182,0.5)]"></div>
+            <span className="text-[9px] font-semibold uppercase tracking-widest text-brand-blue/60">System Ready</span>
           </div>
           <div className="h-3 w-px bg-slate-200"></div>
-          <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Padrão: {isPimaco365 ? 'Pimaco A4365' : settings.size}</span>
+          <span className="text-[9px] font-semibold uppercase tracking-widest text-brand-blue/30">Padrão: {isPimaco365 ? 'Pimaco A4365' : settings.size}</span>
         </div>
         <div className="flex items-center gap-4 text-slate-300">
           <Sparkles className="w-3 h-3" />
-          <span className="text-[9px] font-black uppercase tracking-widest">Smart Label Pro v2.5</span>
+          <span className="text-[9px] font-semibold uppercase tracking-widest text-brand-blue/40">Smart Label Pro v2.5</span>
         </div>
       </footer>
     </div>
