@@ -79,9 +79,10 @@
             html,
             body {
                 width: 210mm;
-                height: 297mm;
+                height: auto !important;
                 margin: 0 !important;
                 padding: 0 !important;
+                overflow: visible !important;
                 background: white !important;
                 print-color-adjust: exact !important;
                 -webkit-print-color-adjust: exact !important;
@@ -100,17 +101,6 @@
 
         .preview-shadow {
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-        }
-
-        .label-container {
-            border: 0.25mm dashed #94a3b8 !important;
-            box-sizing: border-box !important;
-        }
-
-        @media screen {
-            .label-container {
-                border-width: 1px !important;
-            }
         }
     </style>
     <script type="importmap">

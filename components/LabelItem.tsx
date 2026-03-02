@@ -70,6 +70,7 @@ export const LabelItem: React.FC<LabelItemProps> = ({ label, settings }) => {
     flexDirection: 'column',
     padding: isPimaco365 ? '5mm 7mm' : (isSmallFile ? '2mm 3mm' : (isLarge ? '6mm 10mm' : '3.5mm 7mm')),
     boxSizing: 'border-box',
+    border: settings.showDashedLines ? '0.25mm dashed #94a3b8' : 'none',
     printColorAdjust: 'exact',
     WebkitPrintColorAdjust: 'exact'
   };
@@ -160,11 +161,7 @@ export const LabelItem: React.FC<LabelItemProps> = ({ label, settings }) => {
               <div className={`flex items-end ${isPimaco365 ? 'h-[20mm]' : 'h-[15mm]'}`}>
                 <img src={settings.logoUrl} className={`max-h-full ${isPimaco365 ? 'max-w-[50mm]' : 'max-w-[42mm]'} object-contain grayscale opacity-90 transition-all`} alt="Logo" />
               </div>
-            ) : (
-              <div className="border border-slate-100 px-4 py-2 text-[6pt] uppercase font-semibold text-slate-200 tracking-[0.3em]">
-                Authentic
-              </div>
-            )}
+            ) : null}
           </div>
         </div>
       );

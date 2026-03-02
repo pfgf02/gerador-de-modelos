@@ -48,4 +48,5 @@ export interface AppSettings {
   primaryColor: string;
   logoUrl: string | null;
   globalTitle: string;
+  showDashedLines: boolean;
 }

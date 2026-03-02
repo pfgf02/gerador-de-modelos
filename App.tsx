@@ -32,7 +32,8 @@ const App: React.FC = () => {
     template: LabelTemplate.INDUSTRIAL,
     primaryColor: '#0060B6',
     logoUrl: null,
-    globalTitle: ''
+    globalTitle: '',
+    showDashedLines: true
   });
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -318,6 +319,7 @@ const App: React.FC = () => {
                           type="number"
                           min={1}
                           value={batchForm.quantidade}
+                          onFocus={e => e.target.select()}
                           onChange={e => setBatchForm({ ...batchForm, quantidade: parseInt(e.target.value) || 1 })}
                           className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-xs font-semibold uppercase outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/5 transition-all"
                         />
@@ -329,6 +331,7 @@ const App: React.FC = () => {
                           type="number"
                           min={1}
                           value={batchForm.inicioSequencia}
+                          onFocus={e => e.target.select()}
                           onChange={e => setBatchForm({ ...batchForm, inicioSequencia: parseInt(e.target.value) || 1 })}
                           className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-xs font-semibold uppercase outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/5 transition-all"
                         />
@@ -473,6 +476,26 @@ const App: React.FC = () => {
                       </button>
                     ))}
                   </div>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-medium text-slate-400 uppercase mb-3 tracking-wide flex items-center gap-2">
+                    <Grid3X3 className="w-3 h-3" /> Linhas de Corte
+                  </label>
+                  <button
+                    onClick={() => setSettings({ ...settings, showDashedLines: !settings.showDashedLines })}
+                    className={`w-full flex items-center justify-between p-3.5 rounded-xl border-2 transition-all ${settings.showDashedLines
+                      ? 'border-brand-blue bg-brand-blue/5 text-brand-blue'
+                      : 'border-slate-100 bg-slate-50 text-slate-400 hover:border-slate-200'
+                      }`}
+                  >
+                    <span className="text-[10px] font-semibold uppercase tracking-widest pl-2">
+                      {settings.showDashedLines ? 'Exibir Tracejado' : 'Ocultar Tracejado'}
+                    </span>
+                    <div className={`w-10 h-5 rounded-full relative transition-colors ${settings.showDashedLines ? 'bg-brand-blue' : 'bg-slate-200'}`}>
+                      <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${settings.showDashedLines ? 'left-6' : 'left-1'}`}></div>
+                    </div>
+                  </button>
                 </div>
               </div>
             </section>
@@ -622,6 +645,7 @@ const App: React.FC = () => {
                                             <input
                                               type={settings.template === LabelTemplate.INDUSTRIAL ? 'number' : 'text'}
                                               value={settings.template === LabelTemplate.INDUSTRIAL ? label.volume : label.year}
+                                              onFocus={e => e.target.select()}
                                               onChange={e => updateLabel(label.id, settings.template === LabelTemplate.INDUSTRIAL ? 'volume' : 'year', e.target.value)}
                                               className="w-full bg-white border border-slate-200 rounded-xl p-3.5 text-xs font-medium uppercase outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/5 transition-all shadow-sm"
                                             />
